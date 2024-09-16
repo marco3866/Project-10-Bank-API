@@ -3,7 +3,11 @@
 - First Name: `Tony`
 - Last Name: `Stark`
 - Email: `tony@stark.com`
-- Password: `password123`
+- Password: `password123
+
+
+Token:
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2YjM2Mzg4MTM3ZDJhMzNhY2I1ZWY2NiIsImlhdCI6MTcyNjE0MzE2OSwiZXhwIjoxNzI2MjI5NTY5fQ.UG5QlzmNVLQOo3XU5se6Pc_Lk-h8BZD9lwyWPWRtowA`
 
 ### Steve Rogers
 
@@ -11,3 +15,7 @@
 - Last Name: `Rogers`,
 - Email: `steve@rogers.com`,
 - Password: `password456`
+
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2YjM2Mzg4MTM3ZDJhMzNhY2I1ZWY2NCIsImlhdCI6MTcyNjE0MzI1MiwiZXhwIjoxNzI2MjI5NjUyfQ.yuH1gkb8eDjKDlJeGPUoB28tC3OEAxlhx1nSM4uOTLE
+
+

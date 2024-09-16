@@ -1,0 +1,157 @@
+# 1. Info Générale
+swagger: '2.0'  # Version du standard Swagger utilisée
+info:
+  title: API des Transactions de Bank Argent  # Titre de l'API
+  description: API pour gérer et visualiser les transactions des utilisateurs dans Bank Argent.  # Description de l'API
+  x-current-month: "Mois actuel : Septembre 2024"  # Mise à jour manuelle
+  version: '1.0.0'  # Version de l'API
+  x-generated-at: "Généré le : 2024-09-12"  # Date manuelle ajoutée ici
+
+# Les propriétés `host`, `basePath`, et `schemes` doivent être en dehors de la section `info`.
+host: localhost:3001  # Hôte sur lequel l'API est hébergée
+basePath: /api/v1  # Chemin de base pour toutes les routes de l'API
+schemes:
+  - http  # Schéma utilisé (HTTP)
+
+# 2. Les Chemins (Paths)
+paths:
+  # 2.1 Endpoint pour récupérer toutes les transactions de l'utilisateur actuel
+  /transactions:
+    get:
+      tags:
+        - Transactions  # Catégorie pour regrouper les endpoints liés aux transactions
+      summary: Récupérer toutes les transactions de l'utilisateur actuel
+      description: Récupère une liste de toutes les transactions pour l'utilisateur authentifié.
+      security:
+        - Bearer: []  # Le token JWT est requis pour accéder à cette ressource
+      produces:
+        - application/json  # Format de la réponse
+      responses:
+        '200':
+          description: Une liste des transactions est retournée
+          schema:
+            type: array  # La réponse est un tableau d'objets
+            items:
+              $ref: '#/definitions/Transaction'  # Référence à la définition de l'objet Transaction
+        '401':
+          description: Non autorisé - l'utilisateur doit être authentifié
+
+  # 2.2 Endpoint pour récupérer les détails d'une transaction spécifique
+  /transactions/{transactionId}:
+    get:
+      tags:
+        - Transactions
+      summary: Obtenir les détails d'une transaction spécifique
+      description: Récupère les informations détaillées d'une transaction spécifique par ID.
+      parameters:
+        - name: transactionId
+          in: path
+          required: true
+          description: L'ID de la transaction à récupérer
+          type: string
+      security:
+        - Bearer: []  # Le token JWT est requis pour accéder à cette ressource
+      produces:
+        - application/json  # Format de la réponse
+      responses:
+        '200':
+          description: Les détails de la transaction sont retournés avec succès
+          schema:
+            $ref: '#/definitions/TransactionDetail'  # Référence à la définition de l'objet TransactionDetail
+        '404':
+          description: Transaction non trouvée
+        '401':
+          description: Non autorisé - l'utilisateur doit être authentifié
+
+    # 2.3 Endpoint pour mettre à jour une transaction spécifique
+    put:
+      tags:
+        - Transactions
+      summary: Mettre à jour les détails d'une transaction
+      description: Permet à l'utilisateur de mettre à jour la catégorie et les notes pour une transaction spécifique.
+      parameters:
+        - name: transactionId
+          in: path
+          required: true
+          description: L'ID de la transaction à mettre à jour
+          type: string
+        - in: body
+          name: body
+          description: Les détails de la transaction à mettre à jour
+          required: true
+          schema:
+            $ref: '#/definitions/UpdateTransaction'  # Référence à la définition de l'objet UpdateTransaction
+      security:
+        - Bearer: []  # Le token JWT est requis pour accéder à cette ressource
+      produces:
+        - application/json  # Format de la réponse
+      responses:
+        '200':
+          description: La transaction a été mise à jour avec succès
+          schema:
+            $ref: '#/definitions/TransactionDetail'  # Référence à la définition de l'objet TransactionDetail
+        '400':
+          description: Entrée invalide
+        '404':
+          description: Transaction non trouvée
+        '401':
+          description: Non autorisé - l'utilisateur doit être authentifié
+
+# 3. Les Définitions (Definitions)
+definitions:
+  Transaction:
+    type: object
+    properties:
+      id:
+        type: string
+        description: Identifiant unique pour la transaction
+      date:
+        type: string
+        format: date
+        description: Date de la transaction
+      description:
+        type: string
+        description: Description de la transaction
+      amount:
+        type: number
+        format: float
+        description: Montant de la transaction
+      balance:
+        type: number
+        format: float
+        description: Solde après la transaction
+
+  # 3.1. TransactionDetail : Prend en compte les 3 parties demandées
+  TransactionDetail:
+    type: object
+    allOf:
+      - $ref: '#/definitions/Transaction'  # Hérite des propriétés de la définition Transaction
+      - properties:
+          transactionType:  # 1ère partie : Type de la transaction
+            type: string
+            description: Type de la transaction (par exemple, Électronique, Manuel)
+          category:  # 2ème partie : Catégorie de la transaction
+            type: string
+            description: Catégorie de la transaction (par exemple, Alimentation, Transport)
+          notes:  # 3ème partie : Notes supplémentaires pour la transaction
+            type: string
+            description: Notes supplémentaires pour la transaction
+
+  # 3.2. UpdateTransaction : Utilisé pour la mise à jour des transactions
+  UpdateTransaction:
+    type: object
+    properties:
+      category:
+        type: string
+        description: Catégorie mise à jour pour la transaction
+      notes:
+        type: string
+        description: Notes mises à jour pour la transaction
+
+# 4. Security Definitions
+securityDefinitions:
+  Bearer:
+    type: apiKey
+    name: Authorization
+    in: header
+    description: "Token JWT pour l'authentification"

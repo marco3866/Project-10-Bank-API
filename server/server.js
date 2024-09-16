@@ -1,38 +1,48 @@
-const express = require('express')
-const dotEnv = require('dotenv')
-const cors = require('cors')
-const swaggerUi = require('swagger-ui-express')
-const yaml = require('yamljs')
-const swaggerDocs = yaml.load('./swagger.yaml')
-const dbConnection = require('./database/connection')
+const express = require('express');
+const dotEnv = require('dotenv');
+const cors = require('cors');
+const swaggerUi = require('swagger-ui-express');
+const yaml = require('yamljs');
+const dbConnection = require('./database/connection');
 
-dotEnv.config()
+// Charger les fichiers YAML Swagger
+const swaggerDocs = yaml.load('./swagger.yaml');
+const swaggerFuturDocs = yaml.load('./swaggerfutur.yaml'); // Nouveau fichier swagger futur
 
-const app = express()
-const PORT = process.env.PORT || 3001
+dotEnv.config();
 
-// Connect to the database
-dbConnection()
+const app = express();
+const PORT = process.env.PORT || 3001;
 
-// Handle CORS issues
-app.use(cors())
+// Connecter à la base de données
+dbConnection();
 
-// Request payload middleware
-app.use(express.json())
-app.use(express.urlencoded({ extended: true }))
+// Gérer les problèmes CORS
+app.use(cors());
 
-// Handle custom routes
-app.use('/api/v1/user', require('./routes/userRoutes'))
+// Middleware pour les payloads des requêtes
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// API Documentation
+// Routes pour l'API utilisateur
+app.use('/api/v1/user', require('./routes/userRoutes'));
+
+// Documentation API Swagger pour swagger.yaml
 if (process.env.NODE_ENV !== 'production') {
-  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs))
+  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 }
 
-app.get('/', (req, res, next) => {
-  res.send('Hello from my Express server v2!')
-})
+// Documentation API Swagger pour swaggerfutur.yaml
+if (process.env.NODE_ENV !== 'production') {
+  app.use('/api-futur-docs', swaggerUi.serve, swaggerUi.setup(swaggerFuturDocs));
+}
 
+// Route de test basique
+app.get('/', (req, res) => {
+  res.send('Hello from my Express server v2!');
+});
+
+// Lancer le serveur
 app.listen(PORT, () => {
-  console.log(`Server listening on http://localhost:${PORT}`)
-})
+  console.log(`Server listening on http://localhost:${PORT}`);
+});
